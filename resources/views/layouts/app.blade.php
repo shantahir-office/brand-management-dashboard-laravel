@@ -45,7 +45,7 @@
     <div class="lg:pl-64 flex flex-col min-h-screen">
         <!-- Top Navigation Bar -->
         <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 border-b border-slate-200/80 dark:border-slate-800 shadow-2xs backdrop-blur-md transition-colors">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-10xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <!-- Left: Mobile Sidebar Toggle + Brand Title -->
                     <div class="flex items-center space-x-3">
@@ -111,7 +111,7 @@
 
         <!-- Main Content Area -->
         <main class="flex-1 py-6 sm:py-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-10xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Flash Toast Notifications -->
                 @include('dashboard.components.toast')
 
@@ -121,7 +121,7 @@
 
         <!-- Clean Footer -->
         <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-xs text-slate-500 dark:text-slate-400 transition-colors">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="max-w-10xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center space-x-2">
                     <span class="font-medium text-slate-700 dark:text-slate-300">BrandOS</span>
                     <span>&bull;</span>

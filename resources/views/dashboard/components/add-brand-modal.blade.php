@@ -12,7 +12,7 @@
         data-twe-modal-dialog-ref
         class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[620px] px-4">
         
-        <div class="pointer-events-auto relative flex w-full flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl outline-none">
+        <div class="pointer-events-auto relative flex w-full flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl outline-none pt-10">
             {{-- Modal Header --}}
             <div class="flex flex-shrink-0 items-center justify-between rounded-t-2xl border-b border-slate-100 dark:border-slate-800 px-6 py-4">
                 <div class="flex items-center space-x-2.5">
