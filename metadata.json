@@ -1,0 +1,8 @@
+{
+  "name": "Brand Management Dashboard",
+  "description": "Manage development brands, repositories, tokens and ownership from one place with clean Laravel structure, Tailwind CSS 4, and TW Elements.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

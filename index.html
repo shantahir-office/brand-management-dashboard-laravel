@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full w-full max-w-full overflow-x-hidden bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Brand Management Dashboard</title>
+    <meta name="description" content="Manage development brands, repositories, tokens and ownership from one place with clean Laravel structure, Tailwind CSS 4, and TW Elements.">
+    <meta property="og:title" content="Brand Management Dashboard">
+    <meta property="og:description" content="Manage development brands, repositories, tokens and ownership from one place with clean Laravel structure, Tailwind CSS 4, and TW Elements.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Anti-Flash Dark Mode Script -->
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/resources/css/app.css">
+
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        code, pre, .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="min-h-full w-full max-w-full overflow-x-hidden flex flex-col bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 border-b border-slate-200/80 dark:border-slate-800 shadow-xs backdrop-blur-md">
+        <div class="px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14 sm:h-16 gap-2">
+                <!-- Left: Sidebar Toggle & Brand Area -->
+                <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                    <!-- Mobile Sidebar Hamburger Toggle -->
+                    <button
+                        type="button"
+                        onclick="toggleSidebar()"
+                        class="lg:hidden p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none shrink-0"
+                        aria-label="Toggle Navigation Side Panel">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+
+                    <!-- App Logo & Badge -->
+                    <a href="/" class="flex items-center space-x-2 sm:space-x-3 group min-w-0">
+                        <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-600 flex items-center justify-center text-white shadow-sm shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition transform shrink-0">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-sm sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5 sm:gap-2">
+                                <span class="truncate">BrandOS</span>
+                                <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
+                                    Laravel + Blade
+                                </span>
+                            </div>
+                            <p class="hidden sm:block text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Internal Brand & Repository Manager</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Right Side Actions: Theme Switcher, Storage Badge, Add Brand -->
+                <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+                    <!-- JSON Storage Info Pill -->
+                    <div class="hidden xl:flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100/80 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Driver: <code class="text-indigo-600 dark:text-indigo-400 font-mono">storage/app/brands.json</code></span>
+                    </div>
+
+                    <!-- Dark / Light Mode Toggle Button -->
+                    <button
+                        type="button"
+                        onclick="toggleTheme()"
+                        id="theme-toggle-btn"
+                        title="Toggle Light / Dark Mode"
+                        class="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition focus:outline-none shrink-0">
+                        <!-- Sun Icon (shown in Dark Mode) -->
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <!-- Moon Icon (shown in Light Mode) -->
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Add Brand Action Button -->
+                    <button
+                        type="button"
+                        data-twe-toggle="modal"
+                        data-twe-target="#addBrandModal"
+                        data-twe-ripple-init
+                        class="inline-flex items-center px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-indigo-200 dark:shadow-none transition focus:outline-none focus:ring-2 focus:ring-indigo-500 shrink-0">
+                        <svg class="w-4 h-4 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span class="hidden sm:inline">+ Add New Brand</span>
+                        <span class="inline sm:hidden ml-1">Brand</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace with Collapsible/Permanent Side Panel -->
+    <div class="flex-1 flex w-full max-w-full overflow-x-hidden bg-slate-100 dark:bg-slate-950">
+        <!-- Sidebar Backdrop for Mobile -->
+        <div
+            id="sidebar-backdrop"
+            onclick="toggleSidebar()"
+            class="fixed inset-0 bg-slate-900/50 dark:bg-black/70 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity">
+        </div>
+
+        <!-- SIDE PANEL / SIDEBAR -->
+        <aside
+            id="app-sidebar"
+            class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transform -translate-x-full lg:translate-x-0 lg:static lg:w-64 transition-transform duration-300 ease-in-out shrink-0">
+            
+            <!-- Sidebar Header (Mobile close) -->
+            <div class="h-16 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800 lg:hidden">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                        B
+                    </div>
+                    <span class="font-bold text-slate-900 dark:text-white">Navigation Panel</span>
+                </div>
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Sidebar Navigation Links & Quick Filters -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                <!-- Section 1: Main Navigation -->
+                <div>
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 mb-2">
+                        Dashboard & Management
+                    </div>
+                    <nav class="space-y-1">
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('all')"
+                            data-sidebar-category="all"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-xl transition text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50">
+                            <span class="flex items-center gap-2.5">
+                                <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                                </svg>
+                                <span>All Brands</span>
+                            </span>
+                            <span id="sidebar-count-all" class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">
+                                15
+                            </span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('custom_manager')"
+                            data-sidebar-category="custom_manager"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="flex items-center gap-2.5">
+                                <svg class="w-4 h-4 text-violet-600 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                <span class="font-semibold">⚡ Custom Status Manager</span>
+                            </span>
+                            <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300">
+                                Bulk Edit
+                            </span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Section 2: Quick Status Filters -->
+                <div>
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 mb-2">
+                        Status Filter
+                    </div>
+                    <nav class="space-y-1">
+                        <button
+                            type="button"
+                            onclick="quickFilterStatus('Active')"
+                            class="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="flex items-center gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span>Active</span>
+                            </span>
+                            <span id="sidebar-count-active" class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                                6
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="quickFilterStatus('Development')"
+                            class="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="flex items-center gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                <span>In Development</span>
+                            </span>
+                            <span id="sidebar-count-dev" class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300">
+                                4
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="quickFilterStatus('Completed')"
+                            class="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="flex items-center gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                <span>Completed</span>
+                            </span>
+                            <span id="sidebar-count-completed" class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300">
+                                2
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="quickFilterLaravel()"
+                            class="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="flex items-center gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                <span>Laravel Brands</span>
+                            </span>
+                            <span id="sidebar-count-laravel" class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
+                                11
+                            </span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Section 3: Categories -->
+                <div>
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 mb-2">
+                        Categories
+                    </div>
+                    <nav class="space-y-1" id="sidebar-categories-nav">
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('TM Brands')"
+                            data-sidebar-category="TM Brands"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="truncate">TM Brands</span>
+                            <span class="sidebar-cat-count px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" data-cat="TM Brands">2</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('FTP Details')"
+                            data-sidebar-category="FTP Details"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="truncate">FTP Details</span>
+                            <span class="sidebar-cat-count px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" data-cat="FTP Details">2</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('Design Brands')"
+                            data-sidebar-category="Design Brands"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="truncate">Design Brands</span>
+                            <span class="sidebar-cat-count px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" data-cat="Design Brands">2</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('Books Brands / POS')"
+                            data-sidebar-category="Books Brands / POS"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="truncate">Books Brands / POS</span>
+                            <span class="sidebar-cat-count px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" data-cat="Books Brands / POS">2</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('OC Brands')"
+                            data-sidebar-category="OC Brands"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="truncate">OC Brands</span>
+                            <span class="sidebar-cat-count px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" data-cat="OC Brands">2</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('DBA Brands')"
+                            data-sidebar-category="DBA Brands"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="truncate">DBA Brands</span>
+                            <span class="sidebar-cat-count px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" data-cat="DBA Brands">2</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('HR Brand')"
+                            data-sidebar-category="HR Brand"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="truncate">HR Brand</span>
+                            <span class="sidebar-cat-count px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" data-cat="HR Brand">1</span>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="setCategoryFilter('PPC Brands')"
+                            data-sidebar-category="PPC Brands"
+                            class="sidebar-nav-item w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+                            <span class="truncate">PPC Brands</span>
+                            <span class="sidebar-cat-count px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" data-cat="PPC Brands">1</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Sidebar Bottom Theme & Driver Controls -->
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-2">
+                <!-- Theme Switcher Tile in Sidebar -->
+                <button
+                    type="button"
+                    onclick="toggleTheme()"
+                    class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <span id="theme-text">Toggle Theme</span>
+                    </span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300">
+                        Ctrl+D
+                    </span>
+                </button>
+
+                <div class="text-[11px] text-slate-400 dark:text-slate-500 text-center">
+                    Laravel Traditional Architecture
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Content Area -->
+        <main class="flex-1 min-w-0 w-full max-w-full py-5 sm:py-8 px-3 sm:px-6 lg:px-8 bg-slate-100 dark:bg-slate-950 overflow-x-hidden">
+            <!-- Toast Notification Container (hidden when empty to avoid ghost whitespace) -->
+            <div id="toast-container" class="empty:hidden space-y-2 mb-4"></div>
+
+            <div class="space-y-6">
+                <!-- Header Section -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-2">
+                    <div>
+                        <h1 class="text-xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                            Brand Management
+                        </h1>
+                        <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Manage development brands, repositories, tokens and ownership from one place.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button
+                            type="button"
+                            data-twe-toggle="modal"
+                            data-twe-target="#addBrandModal"
+                            data-twe-ripple-init
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-indigo-200 dark:shadow-none transition focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            <span>+ Add New Brand</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Statistics Cards -->
+                <div class="mb-8 space-y-4">
+                    <!-- Top 4 Primary Metric Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Total Brands Card -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Brands</span>
+                                <span class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition transform">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="mt-4 flex items-baseline justify-between">
+                                <span class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white" id="stat-total">14</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">8 Categories</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Brands Card -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Active Brands</span>
+                                <span class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition transform">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="mt-4 flex items-baseline justify-between">
+                                <span class="text-3xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400" id="stat-active">6</span>
+                                <span class="text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full" id="stat-active-pct">43% of total</span>
+                            </div>
+                        </div>
+
+                        <!-- In Development Card -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">In Development</span>
+                                <span class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition transform">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="mt-4 flex items-baseline justify-between">
+                                <span class="text-3xl font-extrabold tracking-tight text-blue-600 dark:text-blue-400" id="stat-development">4</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Work in progress</span>
+                            </div>
+                        </div>
+
+                        <!-- Completed Card -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Completed</span>
+                                <span class="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 group-hover:scale-105 transition transform">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="mt-4 flex items-baseline justify-between">
+                                <span class="text-3xl font-extrabold tracking-tight text-purple-600 dark:text-purple-400" id="stat-completed">2</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Production ready</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Metric & Data Quality Banner -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- Laravel Brands -->
+                        <div class="bg-gradient-to-r from-rose-50/70 to-orange-50/70 dark:from-rose-950/30 dark:to-orange-950/30 rounded-xl p-4 border border-rose-200/80 dark:border-rose-900/50 flex items-center justify-between shadow-xs">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-2.5 rounded-lg bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold uppercase tracking-wider text-rose-800 dark:text-rose-300">Laravel Stack</div>
+                                    <div class="text-xl font-bold text-rose-900 dark:text-rose-200"><span id="stat-laravel">11</span> <span class="text-xs font-normal text-rose-700 dark:text-rose-400">brands powered by Laravel</span></div>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-rose-200/80 dark:bg-rose-900 text-rose-900 dark:text-rose-200">
+                                YES
+                            </span>
+                        </div>
+
+                        <!-- Missing Token Warning Indicator -->
+                        <div class="bg-amber-50/70 dark:bg-amber-950/30 rounded-xl p-4 border border-amber-200/80 dark:border-amber-900/50 flex items-center justify-between shadow-xs">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-2.5 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300">Missing Token</div>
+                                    <div class="text-xl font-bold text-amber-900 dark:text-amber-200"><span id="stat-missing-token">5</span> <span class="text-xs font-normal text-amber-700 dark:text-amber-400">brands need auth token</span></div>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200">
+                                Attention
+                            </span>
+                        </div>
+
+                        <!-- Missing Repository Warning Indicator -->
+                        <div class="bg-slate-100/70 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-300/80 dark:border-slate-700 flex items-center justify-between shadow-xs">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-2.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">Missing Repository</div>
+                                    <div class="text-xl font-bold text-slate-900 dark:text-white"><span id="stat-missing-repo">3</span> <span class="text-xs font-normal text-slate-600 dark:text-slate-400">brands without Git link</span></div>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">
+                                Needs Repo
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search & Filter Controls -->
+                <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
+                        <!-- Search Bar -->
+                        <div class="lg:col-span-5 relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <input
+                                type="text"
+                                id="filter-search"
+                                placeholder="Search brand name, owner, or repo link..."
+                                class="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                        </div>
+
+                        <!-- Status Filter -->
+                        <div class="lg:col-span-3">
+                            <select
+                                id="filter-status"
+                                class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                <option value="">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Development">Development</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Pending">Pending</option>
+                                <option value="On Hold">On Hold</option>
+                            </select>
+                        </div>
+
+                        <!-- Owner Filter -->
+                        <div class="lg:col-span-2">
+                            <select
+                                id="filter-owner"
+                                class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                <option value="">All Owners</option>
+                            </select>
+                        </div>
+
+                        <!-- Reset Button -->
+                        <div class="lg:col-span-2 flex items-center gap-2">
+                            <button
+                                type="button"
+                                onclick="resetFilters()"
+                                class="w-full px-4 py-2 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                                Reset Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Tabs Navigation -->
+                <div class="border-b border-slate-200 dark:border-slate-800 mb-6 overflow-x-auto">
+                    <nav class="flex space-x-1 sm:space-x-2 min-w-max pb-px" id="category-tabs-nav" aria-label="Brand Categories">
+                        <!-- Populated by resources/js/app.js -->
+                    </nav>
+                </div>
+
+                <!-- Custom Status & Bulk Manager Hero Panel (shown when Custom Manager is active) -->
+                <div id="custom-manager-panel" class="hidden bg-gradient-to-br from-violet-900/10 via-indigo-900/10 to-slate-900/10 dark:from-violet-950/40 dark:via-indigo-950/40 dark:to-slate-900/40 rounded-2xl border border-violet-200/80 dark:border-violet-900/50 p-5 sm:p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-violet-100/80 dark:border-violet-900/40">
+                        <div>
+                            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 dark:bg-violet-900/60 text-violet-700 dark:text-violet-300 mb-2">
+                                <span class="w-2 h-2 rounded-full bg-violet-500 animate-pulse"></span>
+                                <span>Multi-Brand Bulk Operations & Custom Tracking</span>
+                            </div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span>⚡ Custom Status & Bulk Manager</span>
+                            </h2>
+                            <p class="mt-1 text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl">
+                                Select brands from any or all categories with checkboxes, set custom status fields (e.g. <strong>Number Update Status</strong>), and bulk update in one click.
+                            </p>
+                        </div>
+
+                        <!-- Progress Tracker for Number Update -->
+                        <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xs p-4 rounded-xl border border-violet-100 dark:border-violet-900/60 shadow-xs w-full lg:w-auto lg:min-w-[260px]">
+                            <div class="flex items-center justify-between text-xs mb-1.5">
+                                <span class="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    Number Update Progress
+                                </span>
+                                <span id="custom-status-progress-pct" class="font-bold text-emerald-600 dark:text-emerald-400">0%</span>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mb-2">
+                                <div id="custom-status-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-indigo-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                                <span>Updated: <strong id="custom-status-updated-count" class="text-emerald-600 dark:text-emerald-400 font-semibold">0</strong></span>
+                                <span>Pending: <strong id="custom-status-pending-count" class="text-rose-600 dark:text-rose-400 font-semibold">0</strong></span>
+                                <span>Total: <strong id="custom-status-total-count" class="text-slate-700 dark:text-slate-300 font-semibold">0</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Quick Select & Actions inside Custom Manager -->
+                    <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-300 mr-1">Quick Select:</span>
+                            <button
+                                type="button"
+                                onclick="selectBrandsByCategory('TM Brands')"
+                                class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800 hover:bg-indigo-100 transition flex items-center gap-1">
+                                <span>Select All TM Brands</span>
+                                <span class="text-[10px] px-1 py-0.2 rounded bg-indigo-200/70 dark:bg-indigo-900 font-mono" id="tm-brand-count-pill">3</span>
+                            </button>
+                            <button
+                                type="button"
+                                onclick="selectAllFilteredBrands()"
+                                class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                                Select All in View
+                            </button>
+                            <button
+                                type="button"
+                                onclick="invertBrandSelection()"
+                                class="px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                                Invert Selection
+                            </button>
+                            <button
+                                type="button"
+                                onclick="clearBrandSelection()"
+                                class="px-2.5 py-1 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                                Clear All
+                            </button>
+                        </div>
+
+                        <!-- Status Filter Pills for Custom Manager -->
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                            <span class="text-slate-500 dark:text-slate-400 text-[11px]">Filter by Status:</span>
+                            <button
+                                type="button"
+                                onclick="filterByCustomStatus('all')"
+                                id="btn-filter-cs-all"
+                                class="px-2 py-0.5 rounded-md font-semibold bg-violet-600 text-white text-xs transition">
+                                All
+                            </button>
+                            <button
+                                type="button"
+                                onclick="filterByCustomStatus('Updated')"
+                                id="btn-filter-cs-updated"
+                                class="px-2 py-0.5 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs transition">
+                                Number: Updated
+                            </button>
+                            <button
+                                type="button"
+                                onclick="filterByCustomStatus('Not Updated')"
+                                id="btn-filter-cs-not-updated"
+                                class="px-2 py-0.5 rounded-md font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs transition">
+                                Number: Not Updated
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STICKY / FLOATING BULK ACTIONS BAR (appears when 1 or more brands are checked) -->
+                <div id="bulk-action-bar" class="hidden sticky top-20 z-30 mb-4 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-2xl border border-indigo-500/30 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 flex items-center justify-center font-extrabold text-sm shadow-inner" id="bulk-selected-count">
+                            0
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold flex items-center gap-2">
+                                <span>Brand(s) Selected</span>
+                                <span class="text-xs font-normal text-indigo-300 hidden md:inline truncate max-w-[320px]" id="bulk-selected-names"></span>
+                            </div>
+                            <div class="text-xs text-indigo-200/80">Batch update status field or custom properties across all selected</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center flex-wrap gap-2">
+                        <!-- Quick Preset 1: Mark Number Updated -->
+                        <button
+                            type="button"
+                            onclick="quickBatchSetCustomStatus('Number Update', 'Updated')"
+                            class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-sm transition">
+                            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Mark Number Updated
+                        </button>
+
+                        <!-- Quick Preset 2: Mark Number Not Updated -->
+                        <button
+                            type="button"
+                            onclick="quickBatchSetCustomStatus('Number Update', 'Not Updated')"
+                            class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white shadow-sm transition">
+                            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Mark Number Not Updated
+                        </button>
+
+                        <!-- Open Comprehensive Bulk Edit Modal -->
+                        <button
+                            type="button"
+                            onclick="openBulkStatusModal()"
+                            class="inline-flex items-center px-3.5 py-1.5 text-xs font-bold rounded-xl bg-white text-indigo-950 hover:bg-indigo-50 shadow-sm transition">
+                            <svg class="w-3.5 h-3.5 mr-1.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            Custom Field & Batch Options...
+                        </button>
+
+                        <!-- Clear Selection -->
+                        <button
+                            type="button"
+                            onclick="clearBrandSelection()"
+                            class="px-2.5 py-1.5 text-xs font-semibold rounded-xl text-indigo-300 hover:text-white hover:bg-indigo-900/60 transition">
+                            Deselect
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Empty State Component -->
+                <div id="empty-state" class="hidden bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-xs">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">No brands found</h3>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                        There are currently no brands matching this category or filter.
+                    </p>
+                    <div class="mt-6 flex items-center justify-center gap-3">
+                        <button
+                            type="button"
+                            onclick="resetFilters()"
+                            class="px-4 py-2 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                            Clear Filters
+                        </button>
+                        <button
+                            type="button"
+                            data-twe-toggle="modal"
+                            data-twe-target="#addBrandModal"
+                            data-twe-ripple-init
+                            class="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs transition">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            + Add New Brand
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Responsive Brand Table -->
+                <div id="table-container" class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-sm">
+                            <thead class="bg-slate-50/80 dark:bg-slate-800/80 text-xs uppercase tracking-wider font-semibold text-slate-600 dark:text-slate-300">
+                                <tr>
+                                    <!-- Select All Checkbox -->
+                                    <th scope="col" class="py-3.5 pl-4 sm:pl-6 pr-2 w-10 text-center">
+                                        <input
+                                            type="checkbox"
+                                            id="master-select-checkbox"
+                                            title="Select All Brands"
+                                            onchange="toggleSelectAllBrands(this.checked)"
+                                            class="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 dark:bg-slate-800 dark:checked:bg-indigo-600 cursor-pointer transition">
+                                    </th>
+                                    <th scope="col" class="py-3.5 px-3">Brand Name</th>
+                                    <th scope="col" class="py-3.5 px-3">Status</th>
+                                    <!-- Custom Status Field Column (Number Update / Tracking) -->
+                                    <th scope="col" class="py-3.5 px-3">
+                                        <div class="flex items-center gap-1 text-violet-700 dark:text-violet-400">
+                                            <span>Custom Field / Status</span>
+                                            <span class="text-[10px] px-1 py-0.2 rounded bg-violet-100 dark:bg-violet-950 font-bold">New</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="py-3.5 px-3">Owner</th>
+                                    <th scope="col" class="py-3.5 px-3 text-center">Technology</th>
+                                    <th scope="col" class="py-3.5 px-3">Token</th>
+                                    <th scope="col" class="py-3.5 px-3">Repository</th>
+                                    <th scope="col" class="py-3.5 px-4 sm:px-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="brands-tbody" class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                                <!-- Populated dynamically by resources/js/app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Table Footer Summary -->
+                    <div class="px-4 sm:px-6 py-3 bg-slate-50/80 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <div>
+                            Showing <span id="showing-count" class="font-semibold text-slate-700 dark:text-slate-200">14</span> brands in <span id="showing-category" class="font-semibold text-slate-700 dark:text-slate-200">All Categories</span>
+                        </div>
+                        <div class="truncate max-w-full">
+                            JSON Storage: <code class="font-mono text-indigo-600 dark:text-indigo-400 break-all">storage/app/brands.json</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Clean Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-xs text-slate-500 dark:text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-1 sm:gap-2">
+                <span class="font-medium text-slate-700 dark:text-slate-300">Brand Management Dashboard</span>
+                <span class="hidden sm:inline">&bull;</span>
+                <span class="text-slate-500">Powered by Laravel, Blade, Tailwind CSS 4 & TW Elements</span>
+            </div>
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 text-slate-400 dark:text-slate-500">
+                <span>No Database Required</span>
+                <span>&bull;</span>
+                <span>JSON File Driver</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ADD BRAND MODAL (TW Elements) -->
+    <div
+        data-twe-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300"
+        id="addBrandModal"
+        tabindex="-1"
+        aria-labelledby="addBrandModalLabel"
+        aria-hidden="true">
+        
+        <div
+            data-twe-modal-dialog-ref
+            class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[620px] px-4">
+            
+            <div class="pointer-events-auto relative flex w-full flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl outline-none">
+                <div class="flex flex-shrink-0 items-center justify-between rounded-t-2xl border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-base font-bold text-slate-900 dark:text-white" id="addBrandModalLabel">
+                                Add New Brand
+                            </h5>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Record a new development brand into storage/app/brands.json</p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        data-twe-modal-dismiss
+                        aria-label="Close"
+                        class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="add-brand-form">
+                    <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="add_brand_name" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Brand Name <span class="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="brand_name"
+                                    id="add_brand_name"
+                                    required
+                                    placeholder="e.g. Apex Global Trademark"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                            </div>
+
+                            <div>
+                                <label for="add_category" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Category <span class="text-rose-500">*</span>
+                                </label>
+                                <select
+                                    name="category"
+                                    id="add_category"
+                                    required
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                    <option value="TM Brands">TM Brands</option>
+                                    <option value="FTP Details">FTP Details</option>
+                                    <option value="Design Brands">Design Brands</option>
+                                    <option value="Books Brands / POS">Books Brands / POS</option>
+                                    <option value="OC Brands">OC Brands</option>
+                                    <option value="DBA Brands">DBA Brands</option>
+                                    <option value="HR Brand">HR Brand</option>
+                                    <option value="PPC Brands">PPC Brands</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="add_status" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Status
+                                </label>
+                                <select
+                                    name="status"
+                                    id="add_status"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Development" selected>Development</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="On Hold">On Hold</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="add_owner" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Owner / Lead Developer
+                                </label>
+                                <input
+                                    type="text"
+                                    name="owner"
+                                    id="add_owner"
+                                    placeholder="e.g. David Chen"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="add_token" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                Access / API Token
+                            </label>
+                            <input
+                                type="text"
+                                name="token"
+                                id="add_token"
+                                placeholder="e.g. ghp_91K3jd82Akq90Lz82NmK109A"
+                                class="w-full px-3 py-2 text-sm font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                            <p class="mt-1 text-[11px] text-slate-400 dark:text-slate-500">Tokens are stored in storage/app/brands.json and masked in the UI.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="add_repo_link" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Repository URL
+                                </label>
+                                <input
+                                    type="url"
+                                    name="repo_link"
+                                    id="add_repo_link"
+                                    placeholder="https://github.com/organization/repo-name"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                            </div>
+
+                            <div>
+                                <label for="add_repo_owner" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Repository Owner <span class="text-rose-500">*</span>
+                                </label>
+                                <select
+                                    name="repo_owner"
+                                    id="add_repo_owner"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                    <option value="ahmedzafar-devTeam" selected>ahmedzafar-devTeam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="add_technology" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                Technology <span class="text-rose-500">*</span>
+                            </label>
+                            <select
+                                name="technology"
+                                id="add_technology"
+                                required
+                                class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                <option value="Laravel" selected>Laravel</option>
+                                <option value="PHP">PHP</option>
+                                <option value="React">React</option>
+                                <option value="HTML">HTML</option>
+                                <option value="Next.js">Next.js</option>
+                            </select>
+                            <p class="mt-1 text-[11px] text-slate-400 dark:text-slate-500">Select the framework or stack: Laravel, PHP, React, HTML, or Next.js.</p>
+                        </div>
+
+                        <div>
+                            <label for="add_ftp_details" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                FTP / SFTP Details
+                            </label>
+                            <input
+                                type="text"
+                                name="ftp_details"
+                                id="add_ftp_details"
+                                placeholder="e.g. sftp://ftp.example.com:22 | user: deploy_user"
+                                class="w-full px-3 py-2 text-sm font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                        </div>
+
+                        <!-- Custom Field & Status section -->
+                        <div class="p-3.5 bg-violet-50/70 dark:bg-violet-950/30 rounded-xl border border-violet-200/80 dark:border-violet-900/40 space-y-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+                                <span class="text-xs font-bold text-violet-900 dark:text-violet-200">Custom Status & Tracking Field</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label for="add_custom_field_name" class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Custom Field Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="custom_field_name"
+                                        id="add_custom_field_name"
+                                        value="Number Update"
+                                        placeholder="e.g. Number Update"
+                                        class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500">
+                                </div>
+                                <div>
+                                    <label for="add_custom_status" class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Custom Status Value
+                                    </label>
+                                    <select
+                                        name="custom_status"
+                                        id="add_custom_status"
+                                        class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500">
+                                        <option value="">-- None / Unset --</option>
+                                        <option value="Updated" selected>Updated</option>
+                                        <option value="Not Updated">Not Updated</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Pending">Pending</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="add_notes" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                Internal Notes & Description
+                            </label>
+                            <textarea
+                                name="notes"
+                                id="add_notes"
+                                rows="2"
+                                placeholder="Deployment instructions, credentials reminder, or contact info..."
+                                class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 rounded-b-2xl border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90 px-6 py-4">
+                        <button
+                            type="button"
+                            data-twe-modal-dismiss
+                            class="px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 rounded-lg transition">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            data-twe-ripple-init
+                            class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-sm shadow-indigo-200 dark:shadow-none transition">
+                            Save Brand
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT BRAND MODAL (TW Elements) -->
+    <div
+        data-twe-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300"
+        id="editBrandModal"
+        tabindex="-1"
+        aria-labelledby="editBrandModalLabel"
+        aria-hidden="true">
+        
+        <div
+            data-twe-modal-dialog-ref
+            class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[620px] px-4">
+            
+            <div class="pointer-events-auto relative flex w-full flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl outline-none">
+                <div class="flex flex-shrink-0 items-center justify-between rounded-t-2xl border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-base font-bold text-slate-900 dark:text-white" id="editBrandModalLabel">
+                                Edit Brand
+                            </h5>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Update brand records in storage/app/brands.json</p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        data-twe-modal-dismiss
+                        aria-label="Close"
+                        class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="editBrandForm">
+                    <input type="hidden" id="edit_brand_id" name="id">
+
+                    <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="edit_brand_name" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Brand Name <span class="text-rose-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="brand_name"
+                                    id="edit_brand_name"
+                                    required
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                            </div>
+
+                            <div>
+                                <label for="edit_category" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Category <span class="text-rose-500">*</span>
+                                </label>
+                                <select
+                                    name="category"
+                                    id="edit_category"
+                                    required
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                    <option value="TM Brands">TM Brands</option>
+                                    <option value="FTP Details">FTP Details</option>
+                                    <option value="Design Brands">Design Brands</option>
+                                    <option value="Books Brands / POS">Books Brands / POS</option>
+                                    <option value="OC Brands">OC Brands</option>
+                                    <option value="DBA Brands">DBA Brands</option>
+                                    <option value="HR Brand">HR Brand</option>
+                                    <option value="PPC Brands">PPC Brands</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="edit_status" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Status
+                                </label>
+                                <select
+                                    name="status"
+                                    id="edit_status"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Development">Development</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="On Hold">On Hold</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="edit_owner" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Owner / Lead Developer
+                                </label>
+                                <input
+                                    type="text"
+                                    name="owner"
+                                    id="edit_owner"
+                                    placeholder="e.g. Sarah Jenkins"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="edit_token" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                Access / API Token
+                            </label>
+                            <input
+                                type="text"
+                                name="token"
+                                id="edit_token"
+                                placeholder="Leave blank if no token assigned"
+                                class="w-full px-3 py-2 text-sm font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="edit_repo_link" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Repository URL
+                                </label>
+                                <input
+                                    type="url"
+                                    name="repo_link"
+                                    id="edit_repo_link"
+                                    placeholder="https://github.com/organization/repo-name"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                            </div>
+
+                            <div>
+                                <label for="edit_repo_owner" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Repository Owner <span class="text-rose-500">*</span>
+                                </label>
+                                <select
+                                    name="repo_owner"
+                                    id="edit_repo_owner"
+                                    class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                    <option value="ahmedzafar-devTeam" selected>ahmedzafar-devTeam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="edit_technology" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                Technology <span class="text-rose-500">*</span>
+                            </label>
+                            <select
+                                name="technology"
+                                id="edit_technology"
+                                required
+                                class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                                <option value="Laravel">Laravel</option>
+                                <option value="PHP">PHP</option>
+                                <option value="React">React</option>
+                                <option value="HTML">HTML</option>
+                                <option value="Next.js">Next.js</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="edit_ftp_details" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                FTP / SFTP Details
+                            </label>
+                            <input
+                                type="text"
+                                name="ftp_details"
+                                id="edit_ftp_details"
+                                placeholder="ftp.server.internal:21 | user: my_user"
+                                class="w-full px-3 py-2 text-sm font-mono rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition">
+                        </div>
+
+                        <!-- Custom Field & Status section in Edit Modal -->
+                        <div class="p-3.5 bg-violet-50/70 dark:bg-violet-950/30 rounded-xl border border-violet-200/80 dark:border-violet-900/40 space-y-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+                                <span class="text-xs font-bold text-violet-900 dark:text-violet-200">Custom Status & Tracking Field</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label for="edit_custom_field_name" class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Custom Field Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="custom_field_name"
+                                        id="edit_custom_field_name"
+                                        placeholder="e.g. Number Update"
+                                        class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500">
+                                </div>
+                                <div>
+                                    <label for="edit_custom_status" class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Custom Status Value
+                                    </label>
+                                    <select
+                                        name="custom_status"
+                                        id="edit_custom_status"
+                                        class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500">
+                                        <option value="">-- None / Unset --</option>
+                                        <option value="Updated">Updated</option>
+                                        <option value="Not Updated">Not Updated</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Pending">Pending</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="edit_notes" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                Internal Notes & Description
+                            </label>
+                            <textarea
+                                name="notes"
+                                id="edit_notes"
+                                rows="2"
+                                placeholder="Optional notes or deployment instructions..."
+                                class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 outline-none transition"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 rounded-b-2xl border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90 px-6 py-4">
+                        <button
+                            type="button"
+                            data-twe-modal-dismiss
+                            class="px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 rounded-lg transition">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            data-twe-ripple-init
+                            class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-sm shadow-indigo-200 dark:shadow-none transition">
+                            Update Brand
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE BRAND MODAL (TW Elements) -->
+    <div
+        data-twe-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300"
+        id="deleteBrandModal"
+        tabindex="-1"
+        aria-labelledby="deleteBrandModalLabel"
+        aria-hidden="true">
+        
+        <div
+            data-twe-modal-dialog-ref
+            class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-20 min-[576px]:max-w-[460px] px-4">
+            
+            <div class="pointer-events-auto relative flex w-full flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl outline-none">
+                <div class="p-6 text-center">
+                    <div class="mx-auto w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1" id="deleteBrandModalLabel">
+                        Delete Brand
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                        Are you sure you want to permanently delete <strong id="deleteBrandName" class="text-slate-800 dark:text-slate-200">this brand</strong>?
+                    </p>
+                    <p class="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+                        This action will remove the record from <code class="font-mono bg-rose-50 dark:bg-rose-950/60 px-1 py-0.5 rounded">storage/app/brands.json</code>.
+                    </p>
+                </div>
+
+                <form id="deleteBrandForm" class="flex items-center justify-center space-x-3 rounded-b-2xl border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/90 px-6 py-4">
+                    <input type="hidden" id="delete_brand_id" name="id">
+
+                    <button
+                        type="button"
+                        data-twe-modal-dismiss
+                        class="px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 rounded-lg transition">
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        data-twe-ripple-init
+                        class="px-5 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 rounded-lg shadow-sm shadow-rose-200 dark:shadow-none transition">
+                        Confirm Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- BULK EDIT / CUSTOM STATUS MODAL (TW Elements) -->
+    <div
+        data-twe-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300"
+        id="bulkEditModal"
+        tabindex="-1"
+        aria-labelledby="bulkEditModalLabel"
+        aria-hidden="true">
+        
+        <div
+            data-twe-modal-dialog-ref
+            class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-10 min-[576px]:max-w-[560px] px-4">
+            
+            <div class="pointer-events-auto relative flex w-full flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl outline-none">
+                <div class="flex flex-shrink-0 items-center justify-between rounded-t-2xl border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="p-2 rounded-lg bg-violet-100 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-base font-bold text-slate-900 dark:text-white" id="bulkEditModalLabel">
+                                Bulk Edit & Custom Status
+                            </h5>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                Apply updates simultaneously to <strong id="bulk-modal-count" class="text-violet-600 dark:text-violet-400">0 brands</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        data-twe-modal-dismiss
+                        aria-label="Close"
+                        class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="bulkEditForm">
+                    <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                        <!-- Selected Brands Preview Tag Box -->
+                        <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1.5">Target Brands</span>
+                            <div id="bulk-modal-brand-pills" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Section: Custom Field & Status -->
+                        <div class="p-4 bg-violet-50/70 dark:bg-violet-950/30 rounded-xl border border-violet-200 dark:border-violet-900/50 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-bold text-violet-900 dark:text-violet-200 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-violet-600 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                    </svg>
+                                    Custom Tracking Field & Status
+                                </label>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-semibold bg-violet-200 dark:bg-violet-900 text-violet-800 dark:text-violet-200">User Requested</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label for="bulk_custom_field_name" class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Field Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="bulk_custom_field_name"
+                                        value="Number Update"
+                                        placeholder="e.g. Number Update"
+                                        class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500">
+                                    <div class="mt-1 flex flex-wrap gap-1">
+                                        <button type="button" onclick="document.getElementById('bulk_custom_field_name').value = 'Number Update'" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-violet-100 hover:text-violet-700">Number Update</button>
+                                        <button type="button" onclick="document.getElementById('bulk_custom_field_name').value = 'DNS / Domain'" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-violet-100 hover:text-violet-700">DNS / Domain</button>
+                                        <button type="button" onclick="document.getElementById('bulk_custom_field_name').value = 'SSL Config'" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-violet-100 hover:text-violet-700">SSL Config</button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="bulk_custom_status" class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                        Set Custom Status To
+                                    </label>
+                                    <select
+                                        id="bulk_custom_status"
+                                        class="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500">
+                                        <option value="Updated" class="text-emerald-600 font-semibold" selected>Updated</option>
+                                        <option value="Not Updated" class="text-rose-600 font-semibold">Not Updated</option>
+                                        <option value="In Progress" class="text-blue-600 font-semibold">In Progress</option>
+                                        <option value="Pending" class="text-amber-600 font-semibold">Pending</option>
+                                        <option value="" class="text-slate-400 font-normal">-- Clear / Unset --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Optional Batch Standard Property Updates -->
+                        <div class="space-y-3 pt-2">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                                Optional Batch Attributes (leave blank to keep current)
+                            </span>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label for="bulk_status" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">
+                                        Standard Brand Status
+                                    </label>
+                                    <select
+                                        id="bulk_status"
+                                        class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                        <option value="">(Keep Existing Status)</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Development">Development</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="On Hold">On Hold</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="bulk_owner" class="block text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1">
+                                        Assign Lead Owner
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="bulk_owner"
+                                        placeholder="(Keep Existing Owner)"
+                                        class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 rounded-b-2xl border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/90 px-6 py-4">
+                        <button
+                            type="button"
+                            data-twe-modal-dismiss
+                            class="px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 rounded-lg transition">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            data-twe-ripple-init
+                            class="px-5 py-2 text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800 rounded-lg shadow-sm shadow-violet-200 dark:shadow-none transition flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Apply Bulk Update
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Entry -->
+    <script type="module" src="/resources/js/app.js"></script>
+</body>
+</html>

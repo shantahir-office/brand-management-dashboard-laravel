@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Base background and viewport boundary styling */
+html {
+    background-color: #f1f5f9;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+html.dark,
+.dark {
+    color-scheme: dark;
+    background-color: #020617;
+}
+
+body {
+    background-color: #f1f5f9;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+.dark body {
+    background-color: #020617;
+}
+
+main {
+    background-color: #f1f5f9;
+}
+.dark main,
+html.dark main {
+    background-color: #020617;
+}
+
+[data-twe-modal-init] {
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Ensure smooth badge rendering */
+.badge-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+}
